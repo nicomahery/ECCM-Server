@@ -96,4 +96,6 @@ CREATE TABLE IF NOT EXISTS car_log(
     fuel_rate double PRECISION NULL
 );
 
-SELECT create_hypertable('car_log','device_time');
+
+SELECT create_hypertable('car_log','device_time')
+WHERE NOT EXISTS (SELECT * FROM timescaledb_information.hypertables WHERE hypertable_name = 'car_log');
