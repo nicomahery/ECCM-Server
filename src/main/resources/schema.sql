@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS car_log(
     maf double PRECISION NULL,
     throttle_pos double PRECISION NULL,
     air_status TEXT NULL,
-    o2_sensors double PRECISION NULL,
+    o2_sensors TEXT NULL,
     o2_b1_s1 double PRECISION NULL,
     o2_b1_s2 double PRECISION NULL,
     o2_b1_s3 double PRECISION NULL,
@@ -32,12 +32,12 @@ CREATE TABLE IF NOT EXISTS car_log(
     o2_b2_s3 double PRECISION NULL,
     o2_b2_s4 double PRECISION NULL,
     obd_compliance TEXT NULL,
-    o2_sensors_alt double PRECISION NULL,
+    o2_sensors_alt TEXT NULL,
     aux_input_status TEXT NULL,
     run_time double PRECISION NULL,
     distance_without_mil double PRECISION NULL,
     fuel_rail_pressure_vac double PRECISION NULL,
-    get_fuel_rail_pressure_direct double PRECISION NULL,
+    fuel_rail_pressure_direct double PRECISION NULL,
     o2_s1_wr_voltage double PRECISION NULL,
     o2_s2_wr_voltage double PRECISION NULL,
     o2_s3_wr_voltage double PRECISION NULL,
@@ -80,10 +80,10 @@ CREATE TABLE IF NOT EXISTS car_log(
     run_time_mil double PRECISION NULL,
     time_since_dtc_cleared double PRECISION NULL,
     max_maf double PRECISION NULL,
-    fuel_type double PRECISION NULL,
+    fuel_type TEXT PRECISION NULL,
     ethanol_percent double PRECISION NULL,
-    get_evap_vapor_pressure_abs double PRECISION NULL,
-    get_evap_vapor_pressure_alt double PRECISION NULL,
+    abs_evap_vapor_pressure double PRECISION NULL,
+    alt_evap_vapor_pressure double PRECISION NULL,
     short_o2_trim_b1 double PRECISION NULL,
     long_o2_trim_b1 double PRECISION NULL,
     short_o2_trim_b2 double PRECISION NULL,
@@ -93,7 +93,8 @@ CREATE TABLE IF NOT EXISTS car_log(
     hybrid_battery_remaining double PRECISION NULL,
     oil_temp double PRECISION NULL,
     fuel_inject_timing double PRECISION NULL,
-    fuel_rate double PRECISION NULL
+    fuel_rate double PRECISION NULL,
+    air_flow_rate double PRECISION  NULL
 );
 
 

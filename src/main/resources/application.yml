@@ -18,3 +18,11 @@ spring:
   sql:
     init:
       mode: always
+
+s3:
+  bucket:
+    location: ${BUCKET_URL}
+    name: ${BUCKET_NAME}
+    access-key: ${BUCKET_ACCESS_KEY}
+    secret-key: ${BUCKET_SECRET_KEY}
+    region: ${BUCKET_REGION}

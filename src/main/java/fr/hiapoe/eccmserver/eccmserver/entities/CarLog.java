@@ -53,7 +53,7 @@ public class CarLog {
     @Column(name = "air_status")
     private String airStatus;
     @Column(name = "o2_sensors")
-    private double O2Sensors;
+    private String O2Sensors;
     @Column(name = "o2_b1_s1")
     private double O2B1S1;
     @Column(name = "o2_b1_s2")
@@ -73,7 +73,7 @@ public class CarLog {
     @Column(name = "obd_compliance")
     private String obdCompliance;
     @Column(name = "o2_sensors_alt")
-    private double O2SensorsAlt;
+    private String O2SensorsAlt;
     @Column(name = "aux_input_status")
     private String auxInputStatus;
     @Column(name = "run_time")
@@ -82,8 +82,8 @@ public class CarLog {
     private double distanceWMIL;
     @Column(name = "fuel_rail_pressure_vac")
     private double fuelRailPressureVAC;
-    @Column(name = "get_fuel_rail_pressure_direct")
-    private double getFuelRailPressureDirect;
+    @Column(name = "fuel_rail_pressure_direct")
+    private double fuelRailPressureDirect;
     @Column(name = "o2_s1_wr_voltage")
     private double O2S1WRVoltage;
     @Column(name = "o2_s2_wr_voltage")
@@ -169,13 +169,13 @@ public class CarLog {
     @Column(name = "max_maf")
     private double maxMAF;
     @Column(name = "fuel_type")
-    private double fuelType;
+    private String fuelType;
     @Column(name = "ethanol_percent")
     private double ethanolPercent;
-    @Column(name = "get_evap_vapor_pressure_abs")
-    private double getEvapVaporPressureABS;
-    @Column(name = "get_evap_vapor_pressure_alt")
-    private double getEvapVaporPressureAlt;
+    @Column(name = "abs_evap_vapor_pressure")
+    private double absEvapVaporPressure;
+    @Column(name = "alt_evap_vapor_pressure")
+    private double altEvapVaporPressure;
     @Column(name = "short_o2_trim_b1")
     private double shortO2TrimB1;
     @Column(name = "long_o2_trim_b1")
@@ -196,6 +196,11 @@ public class CarLog {
     private double fuelInjectTiming;
     @Column(name = "fuel_rate")
     private double fuelRate;
+    @Column(name = "air_flow_rate")
+    private double airFlowRate;
+
+    public CarLog() {
+    }
 
     public String getId() {
         return id;
@@ -203,6 +208,14 @@ public class CarLog {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public double getAirFlowRate() {
+        return airFlowRate;
+    }
+
+    public void setAirFlowRate(double airFlowRate) {
+        this.airFlowRate = airFlowRate;
     }
 
     public String getCarId() {
@@ -381,11 +394,11 @@ public class CarLog {
         this.airStatus = airStatus;
     }
 
-    public double getO2Sensors() {
+    public String getO2Sensors() {
         return O2Sensors;
     }
 
-    public void setO2Sensors(double o2Sensors) {
+    public void setO2Sensors(String o2Sensors) {
         O2Sensors = o2Sensors;
     }
 
@@ -461,11 +474,11 @@ public class CarLog {
         this.obdCompliance = obdCompliance;
     }
 
-    public double getO2SensorsAlt() {
+    public String getO2SensorsAlt() {
         return O2SensorsAlt;
     }
 
-    public void setO2SensorsAlt(double o2SensorsAlt) {
+    public void setO2SensorsAlt(String o2SensorsAlt) {
         O2SensorsAlt = o2SensorsAlt;
     }
 
@@ -501,12 +514,12 @@ public class CarLog {
         this.fuelRailPressureVAC = fuelRailPressureVAC;
     }
 
-    public double getGetFuelRailPressureDirect() {
-        return getFuelRailPressureDirect;
+    public double getFuelRailPressureDirect() {
+        return fuelRailPressureDirect;
     }
 
-    public void setGetFuelRailPressureDirect(double getFuelRailPressureDirect) {
-        this.getFuelRailPressureDirect = getFuelRailPressureDirect;
+    public void setFuelRailPressureDirect(double fuelRailPressureDirect) {
+        this.fuelRailPressureDirect = fuelRailPressureDirect;
     }
 
     public double getO2S1WRVoltage() {
@@ -845,11 +858,11 @@ public class CarLog {
         this.maxMAF = maxMAF;
     }
 
-    public double getFuelType() {
+    public String getFuelType() {
         return fuelType;
     }
 
-    public void setFuelType(double fuelType) {
+    public void setFuelType(String fuelType) {
         this.fuelType = fuelType;
     }
 
@@ -861,20 +874,20 @@ public class CarLog {
         this.ethanolPercent = ethanolPercent;
     }
 
-    public double getGetEvapVaporPressureABS() {
-        return getEvapVaporPressureABS;
+    public double getAbsEvapVaporPressure() {
+        return absEvapVaporPressure;
     }
 
-    public void setGetEvapVaporPressureABS(double getEvapVaporPressureABS) {
-        this.getEvapVaporPressureABS = getEvapVaporPressureABS;
+    public void setAbsEvapVaporPressure(double absEvapVaporPressure) {
+        this.absEvapVaporPressure = absEvapVaporPressure;
     }
 
-    public double getGetEvapVaporPressureAlt() {
-        return getEvapVaporPressureAlt;
+    public double getAltEvapVaporPressure() {
+        return altEvapVaporPressure;
     }
 
-    public void setGetEvapVaporPressureAlt(double getEvapVaporPressureAlt) {
-        this.getEvapVaporPressureAlt = getEvapVaporPressureAlt;
+    public void setAltEvapVaporPressure(double altEvapVaporPressure) {
+        this.altEvapVaporPressure = altEvapVaporPressure;
     }
 
     public double getShortO2TrimB1() {
