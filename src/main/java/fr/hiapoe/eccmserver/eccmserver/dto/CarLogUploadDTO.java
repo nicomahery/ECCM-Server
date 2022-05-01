@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class CarLogUploadDTO {
     private String objectLocation;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime uploadDate;
 
     public CarLogUploadDTO(String objectLocation, LocalDateTime uploadDate) {

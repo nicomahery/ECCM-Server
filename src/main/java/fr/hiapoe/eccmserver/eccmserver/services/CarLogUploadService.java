@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class CarLogUploadService {
@@ -26,6 +26,8 @@ public class CarLogUploadService {
     public static final char SEPARATION_CHARACTER = '\t';
 
     public static String[] HEADER_LIST = {
+        "DEVICE_TIME",
+        "CAR ID",
         "ENGINE LOAD (percent)",
         "COOLANT TEMPERATURE",
         "SHORT FUEL TRIM 1 (percent)",
@@ -111,7 +113,12 @@ public class CarLogUploadService {
         "RELATIVE ACCELELERATOR PEDAL POSITION (percent)",
         "HYBRID BATTERY REMAINING (percent)",
         "OIL TEMPERATURE (degree celsius)",
-        "FUEL INJECTION TIMING (degree)"
+        "FUEL INJECTION TIMING (degree)",
+        "GPS LATITUDE (degree)",
+        "GPS LONGITUDE (degree)",
+        "GPS ALTITUDE (meter)",
+        "GPS SPEED (meter per second)",
+        "GPS TRACK (degree)"
     };
 
     @Autowired
@@ -128,7 +135,7 @@ public class CarLogUploadService {
                     .withCSVParser(this.csvParser)
                     .build();
             List<String[]> rows = csvReader.readAll();
-            Map<String, int> headerIndexMap = this.createHeaderIndexMap(rows.get(0));
+            Map<String, Integer> headerIndexMap = this.createHeaderIndexMap(rows.get(0));
             for (int i = 1; i < headerIndexMap.size(); i++) {
                 this.carLogService.save(this.createCarLogFromRow(rows.get(i), headerIndexMap));
             }
@@ -139,8 +146,8 @@ public class CarLogUploadService {
         return true;
     }
 
-    private Map<String, int> createHeaderIndexMap(String[] headerRow) {
-        Map<String, int> headerIndexMap = new HashMap<String, int>();
+    private Map<String, Integer> createHeaderIndexMap(String[] headerRow) {
+        Map<String, Integer> headerIndexMap = new HashMap<>();
         List<String> list = List.of(headerRow);
         for (String header : HEADER_LIST) {
             int index = list.indexOf(header);
@@ -151,10 +158,13 @@ public class CarLogUploadService {
         return headerIndexMap;
     }
 
-    private CarLog createCarLogFromRow(String[] row, Map<String, int> headerIndexMap) {
+    private CarLog createCarLogFromRow(String[] row, Map<String, Integer> headerIndexMap) {
         CarLog carLog = new CarLog();
         headerIndexMap.forEach((header, index) -> {
             switch (header) {
+                case "DEVICE_TIME" -> carLog.setDeviceTime(this.parseValueToLocalDateTime(row[index]));
+                case "CAR ID" -> carLog.setCarId(this.parseValueToString(row[index]));
+                case "TRIP ID" -> carLog.setTripId(this.parseValueToString(row[index]));
                 case "ENGINE LOAD (percent)" -> carLog.setEngineLoad(this.parseValueToDouble(row[index]));
                 case "COOLANT TEMPERATURE" -> carLog.setCoolantTemp(this.parseValueToDouble(row[index]));
                 case "SHORT FUEL TRIM 1 (percent)" -> carLog.setShortFuelTrim1(this.parseValueToDouble(row[index]));
@@ -169,8 +179,8 @@ public class CarLogUploadService {
                 case "INTAKE TEMPERATURE (degree celsius)" -> carLog.setIntakeTemp(this.parseValueToDouble(row[index]));
                 case "Air Flow Rate (grams per second)" -> carLog.setAirFlowRate(this.parseValueToDouble(row[index]));
                 case "THROTTLE POSITION (percent)" -> carLog.setThrottlePos(this.parseValueToDouble(row[index]));
-                case "AIR STATUS (status)" -> carLog.setAirStatus(row[index]);
-                case "O2 SENSORS (sensors)" -> carLog.setO2Sensors(row[index]);
+                case "AIR STATUS (status)" -> carLog.setAirStatus(this.parseValueToString(row[index]));
+                case "O2 SENSORS (sensors)" -> carLog.setO2Sensors(this.parseValueToString(row[index]));
                 case "O2 BANK1 SENSOR1 (volt)" -> carLog.setO2B1S1(this.parseValueToDouble(row[index]));
                 case "O2 BANK1 SENSOR2 (volt)" -> carLog.setO2B1S2(this.parseValueToDouble(row[index]));
                 case "O2 BANK1 SENSOR3 (volt)" -> carLog.setO2B1S3(this.parseValueToDouble(row[index]));
@@ -179,9 +189,9 @@ public class CarLogUploadService {
                 case "O2 BANK2 SENSOR2 (volt)" -> carLog.setO2B2S2(this.parseValueToDouble(row[index]));
                 case "O2 BANK2 SENSOR3 (volt)" -> carLog.setO2B2S3(this.parseValueToDouble(row[index]));
                 case "O2 BANK2 SENSOR4 (volt)" -> carLog.setO2B2S4(this.parseValueToDouble(row[index]));
-                case "OBD COMPLIANCE" -> carLog.setObdCompliance(row[index]);
-                case "O2 SENSORS PRESENT ALTERNATE" -> carLog.setO2SensorsAlt(row[index]);
-                case "AUX INPUT STATUS (boolean)" -> carLog.setAuxInputStatus(row[index]);
+                case "OBD COMPLIANCE" -> carLog.setObdCompliance(this.parseValueToString(row[index]));
+                case "O2 SENSORS PRESENT ALTERNATE" -> carLog.setO2SensorsAlt(this.parseValueToString(row[index]));
+                case "AUX INPUT STATUS (boolean)" -> carLog.setAuxInputStatus(this.parseValueToString(row[index]));
                 case "ENGINE RUN TIME (second)" -> carLog.setRunTime(this.parseValueToDouble(row[index]));
                 case "DISTANCE TRAVELED WITH MIL on (kilometer)" -> carLog.setDistanceWMIL(this.parseValueToDouble(row[index]));
                 case "FUEL RAIL PRESSURE RELATIVE TO VACUUM (kilopascal)" -> carLog.setFuelRailPressureVAC(this.parseValueToDouble(row[index]));
@@ -228,7 +238,7 @@ public class CarLogUploadService {
                 case "RUN TIME MIL (minute)" -> carLog.setRunTimeMIL(this.parseValueToDouble(row[index]));
                 case "TIME SINCE DTC CLEARED (minute)" -> carLog.setTimeSinceDTCCleared(this.parseValueToDouble(row[index]));
                 case "MAX MASS AIR FLOW (grams per second)" -> carLog.setMaxMAF(this.parseValueToDouble(row[index]));
-                case "FUEL TYPE" -> carLog.setFuelType(row[index]);
+                case "FUEL TYPE" -> carLog.setFuelType(this.parseValueToString(row[index]));
                 case "ETHANOL PERCENT (percent)" -> carLog.setEthanolPercent(this.parseValueToDouble(row[index]));
                 case "ABSOLUTE EVAPORATIVE VAPOR PRESSURE (kilopascal)" -> carLog.setAbsEvapVaporPressure(this.parseValueToDouble(row[index]));
                 case "ALT EVAPORATIVE VAPOR PRESSURE (pascal)" -> carLog.setAltEvapVaporPressure(this.parseValueToDouble(row[index]));
@@ -241,12 +251,34 @@ public class CarLogUploadService {
                 case "HYBRID BATTERY REMAINING (percent)" -> carLog.setHybridBatteryRemaining(this.parseValueToDouble(row[index]));
                 case "OIL TEMPERATURE (degree celsius)" -> carLog.setOilTemp(this.parseValueToDouble(row[index]));
                 case "FUEL INJECTION TIMING (degree)" -> carLog.setFuelInjectTiming(this.parseValueToDouble(row[index]));
+                case "GPS LATITUDE (degree)" -> carLog.setGpsLatitude(this.parseValueToDouble(row[index]));
+                case "GPS LONGITUDE (degree)" -> carLog.setGpsLongitude(this.parseValueToDouble(row[index]));
+                case "GPS ALTITUDE (meter)" -> carLog.setGpsAltitude(this.parseValueToDouble(row[index]));
+                case "GPS SPEED (meter per second)" -> carLog.setGpsSpeed(this.parseValueToDouble(row[index]));
+                case "GPS TRACK (degree)" -> carLog.setGpsTrack(this.parseValueToDouble(row[index]));
             }
         });
         return carLog;
     }
 
-    private double parseValueToDouble(String value) {
+    private String parseValueToString(String value) {
+        if (Objects.equals(value, "None") || Objects.equals(value, "n/a") || Objects.equals(value, "NaN")) {
+            return null;
+        }
+        return value;
+    }
+
+    private Double parseValueToDouble(String value) {
+        if (Objects.isNull(this.parseValueToString(value))) {
+            return null;
+        }
         return Double.parseDouble(value.split(" ")[0]);
+    }
+
+    private LocalDateTime parseValueToLocalDateTime(String value) {
+        if (Objects.isNull(this.parseValueToString(value))) {
+            return null;
+        }
+        return LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS"));
     }
 }

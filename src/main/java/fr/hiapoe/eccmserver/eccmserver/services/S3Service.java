@@ -40,7 +40,7 @@ public class S3Service {
     }
 
     private String getObjectKeyFromObjectLocation(String objectLocation) {
-        return objectLocation.replaceAll(String.format("%s/%s/", this.s3Endpoint, this.bucketName), "");
+        return objectLocation.replaceAll(String.format("https://%s/%s/", this.s3Endpoint, this.bucketName), "");
     }
 
     public byte[] getObject(String objectLocation) throws IOException {

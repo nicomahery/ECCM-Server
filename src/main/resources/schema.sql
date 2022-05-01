@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS car_log(
     device_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id TEXT NOT NULL,
     car_id TEXT NOT NULL,
+    trip_id TEXT NOT NULL,
     gps_latitude double PRECISION NULL,
     gps_longitude double PRECISION NULL,
     gps_altitude double PRECISION NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS car_log(
     run_time_mil double PRECISION NULL,
     time_since_dtc_cleared double PRECISION NULL,
     max_maf double PRECISION NULL,
-    fuel_type TEXT PRECISION NULL,
+    fuel_type TEXT NULL,
     ethanol_percent double PRECISION NULL,
     abs_evap_vapor_pressure double PRECISION NULL,
     alt_evap_vapor_pressure double PRECISION NULL,
