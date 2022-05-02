@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CarLogService {
-    private CarLogRepository carlogRepository;
+    private final CarLogRepository carlogRepository;
 
     @Autowired
     public CarLogService(CarLogRepository carlogRepository) {

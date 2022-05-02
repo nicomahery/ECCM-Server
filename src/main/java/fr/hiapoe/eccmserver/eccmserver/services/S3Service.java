@@ -40,7 +40,13 @@ public class S3Service {
     }
 
     private String getObjectKeyFromObjectLocation(String objectLocation) {
-        return objectLocation.replaceAll(String.format("https://%s/%s/", this.s3Endpoint, this.bucketName), "");
+        if (objectLocation.contains(this.getS3Location())) {
+            return objectLocation.replaceAll(this.getS3Location(), "");
+        }
+        while (objectLocation.startsWith("/")) {
+            objectLocation = objectLocation.substring(1);
+        }
+        return objectLocation;
     }
 
     public byte[] getObject(String objectLocation) throws IOException {
@@ -49,6 +55,10 @@ public class S3Service {
         byte[] bytes = s3Object.getObjectContent().readAllBytes();
         s3Object.close();
         return bytes;
+    }
+
+    public String getS3Location() {
+        return String.format("https://%s/%s/", this.s3Endpoint, this.bucketName);
     }
 
     public void deleteObject(String objectLocation) {
