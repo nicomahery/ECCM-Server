@@ -18,15 +18,15 @@ import java.io.IOException;
 public class S3Service {
     static final int RETRY_COUNT = 10;
     private AmazonS3 s3;
-    @Value("${s3.bucket.location}")
+    @Value("${eccm.s3.bucket.location}")
     private String s3Endpoint;
-    @Value("${s3.bucket.access-key}")
+    @Value("${eccm.s3.bucket.access-key}")
     private String accessKey;
-    @Value("${s3.bucket.secret-key}")
+    @Value("${eccm.s3.bucket.secret-key}")
     private String secretKey;
-    @Value("${s3.bucket.name}")
+    @Value("${eccm.s3.bucket.name}")
     private String bucketName;
-    @Value("${s3.bucket.region}")
+    @Value("${eccm.s3.bucket.region}")
     private String region;
 
     @PostConstruct
