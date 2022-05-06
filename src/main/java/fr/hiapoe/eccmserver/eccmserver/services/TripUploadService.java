@@ -7,7 +7,11 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import fr.hiapoe.eccmserver.eccmserver.dto.CarLogUploadDTO;
 import fr.hiapoe.eccmserver.eccmserver.entities.CarLog;
+import fr.hiapoe.eccmserver.eccmserver.utils.TripImportSummary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.NonTransientDataAccessException;
+import org.springframework.dao.RecoverableDataAccessException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class CarLogUploadService {
+public class TripUploadService {
 
     private final CarLogService carLogService;
     private final S3Service s3Service;
@@ -28,6 +32,7 @@ public class CarLogUploadService {
     public static String[] HEADER_LIST = {
         "DEVICE_TIME",
         "CAR ID",
+        "TRIP ID",
         "ENGINE LOAD (percent)",
         "COOLANT TEMPERATURE",
         "SHORT FUEL TRIM 1 (percent)",
@@ -122,28 +127,41 @@ public class CarLogUploadService {
     };
 
     @Autowired
-    public CarLogUploadService(CarLogService carLogService, S3Service s3Service) {
+    public TripUploadService(CarLogService carLogService, S3Service s3Service) {
         this.carLogService = carLogService;
         this.s3Service = s3Service;
         this.csvParser = new CSVParserBuilder().withSeparator(SEPARATION_CHARACTER).build();
     }
 
-    public boolean processCarLogUpload(CarLogUploadDTO carLogUploadDTO) {
+    public TripImportSummary processCarLogUpload(CarLogUploadDTO carLogUploadDTO) {
+        String tripId = null;
+        long totalCarLogCount = 0;
+        long importedCarLogCount = 0;
         try {
             byte[] bytes = this.s3Service.getObject(carLogUploadDTO.getObjectLocation());
             CSVReader csvReader = new CSVReaderBuilder(new InputStreamReader(new ByteArrayInputStream(bytes)))
                     .withCSVParser(this.csvParser)
                     .build();
             List<String[]> rows = csvReader.readAll();
+            totalCarLogCount = rows.size() - 1;
             Map<String, Integer> headerIndexMap = this.createHeaderIndexMap(rows.get(0));
-            for (int i = 1; i < headerIndexMap.size(); i++) {
-                this.carLogService.save(this.createCarLogFromRow(rows.get(i), headerIndexMap));
+            for (int i = 1; i < rows.size(); i++) {
+                try {
+                    CarLog carLog = this.createCarLogFromRow(rows.get(i), headerIndexMap);
+                    this.carLogService.save(carLog);
+                    if (Objects.isNull(tripId)) {
+                        tripId = carLog.getTripId();
+                    }
+                    importedCarLogCount++;
+                }
+                catch (NonTransientDataAccessException | TransientDataAccessException | RecoverableDataAccessException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException | CsvException e) {
             e.printStackTrace();
-            return false;
         }
-        return true;
+        return new TripImportSummary(tripId, totalCarLogCount, importedCarLogCount);
     }
 
     private Map<String, Integer> createHeaderIndexMap(String[] headerRow) {
