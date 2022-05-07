@@ -11,6 +11,15 @@ public class TripImportSummary {
         this.importedCarLogCount = importedCarLogCount;
     }
 
+    @Override
+    public String toString() {
+        return "TripImportSummary{" +
+                "tripId='" + tripId + '\'' +
+                ", totalCarLogCount=" + totalCarLogCount +
+                ", importedCarLogCount=" + importedCarLogCount +
+                '}';
+    }
+
     public String getTripId() {
         return tripId;
     }

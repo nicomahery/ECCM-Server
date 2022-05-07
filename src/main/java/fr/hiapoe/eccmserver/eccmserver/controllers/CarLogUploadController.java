@@ -25,15 +25,10 @@ public class CarLogUploadController {
 
     @PostMapping(value = "/")
     public ResponseEntity<Object> newCarLogUpload(@RequestBody CarLogUploadDTO carLogUploadDTO) {
-        TripImportSummary tripImportSummary = this.carLogService.processCarLogUpload(carLogUploadDTO);
-        if (!Objects.isNull(tripImportSummary.getTripId())) {
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(tripImportSummary);
-        }
+        this.carLogService.saveTripFromUpload(carLogUploadDTO);
         return ResponseEntity
-                .status(HttpStatus.NOT_ACCEPTABLE)
-                .body("Unable to create Car Log");
+                .status(HttpStatus.OK)
+                .body(String.format("TRIP %s SAVE RECEIVED", carLogUploadDTO.getObjectLocation()));
     }
 
     @GetMapping(value = "/test")

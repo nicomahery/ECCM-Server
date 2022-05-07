@@ -8,10 +8,13 @@ import com.opencsv.exceptions.CsvException;
 import fr.hiapoe.eccmserver.eccmserver.dto.CarLogUploadDTO;
 import fr.hiapoe.eccmserver.eccmserver.entities.CarLog;
 import fr.hiapoe.eccmserver.eccmserver.utils.TripImportSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.dao.TransientDataAccessException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +30,7 @@ public class TripUploadService {
     private final CarLogService carLogService;
     private final S3Service s3Service;
     private final CSVParser csvParser;
+    private final Logger logger = LoggerFactory.getLogger(TripUploadService.class);
     public static final char SEPARATION_CHARACTER = '\t';
 
     public static String[] HEADER_LIST = {
@@ -133,7 +137,16 @@ public class TripUploadService {
         this.csvParser = new CSVParserBuilder().withSeparator(SEPARATION_CHARACTER).build();
     }
 
-    public TripImportSummary processCarLogUpload(CarLogUploadDTO carLogUploadDTO) {
+    @Async
+    public void saveTripFromUpload(CarLogUploadDTO carLogUploadDTO) {
+        TripImportSummary tripImportSummary = this.processCarLogUpload(carLogUploadDTO);
+        if (tripImportSummary.getImportedCarLogCount() < tripImportSummary.getTotalCarLogCount()) {
+            this.logger.warn(String.format("TRIP %s NOT FULLY SAVED", carLogUploadDTO.getObjectLocation()));
+            this.logger.warn(tripImportSummary.toString());
+        }
+    }
+
+    private TripImportSummary processCarLogUpload(CarLogUploadDTO carLogUploadDTO) {
         String tripId = null;
         long totalCarLogCount = 0;
         long importedCarLogCount = 0;
@@ -155,10 +168,12 @@ public class TripUploadService {
                     importedCarLogCount++;
                 }
                 catch (NonTransientDataAccessException | TransientDataAccessException | RecoverableDataAccessException e) {
+                    this.logger.error(e.toString());
                     e.printStackTrace();
                 }
             }
         } catch (IOException | CsvException e) {
+            this.logger.error(e.toString());
             e.printStackTrace();
         }
         return new TripImportSummary(tripId, totalCarLogCount, importedCarLogCount);
