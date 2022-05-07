@@ -2,9 +2,7 @@ package fr.hiapoe.eccmserver.eccmserver.services;
 
 import fr.hiapoe.eccmserver.eccmserver.entities.CarLog;
 import fr.hiapoe.eccmserver.eccmserver.repositories.CarLogRepository;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
