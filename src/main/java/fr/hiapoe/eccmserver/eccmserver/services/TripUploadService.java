@@ -172,6 +172,7 @@ public class TripUploadService {
                     e.printStackTrace();
                 }
             }
+            this.s3Service.deleteObject(carLogUploadDTO.getObjectLocation());
         } catch (IOException | CsvException e) {
             this.logger.error(e.toString());
             e.printStackTrace();
