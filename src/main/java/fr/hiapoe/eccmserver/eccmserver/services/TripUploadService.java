@@ -161,10 +161,10 @@ public class TripUploadService {
             for (int i = 1; i < rows.size(); i++) {
                 try {
                     CarLog carLog = this.createCarLogFromRow(rows.get(i), headerIndexMap);
-                    this.carLogService.save(carLog);
                     if (Objects.isNull(tripId)) {
                         tripId = carLog.getTripId();
                     }
+                    this.carLogService.save(carLog);
                     importedCarLogCount++;
                 }
                 catch (NonTransientDataAccessException | TransientDataAccessException | RecoverableDataAccessException e) {
@@ -172,7 +172,9 @@ public class TripUploadService {
                     e.printStackTrace();
                 }
             }
-            this.s3Service.deleteObject(carLogUploadDTO.getObjectLocation());
+            if (importedCarLogCount >= totalCarLogCount) {
+                this.s3Service.deleteObject(carLogUploadDTO.getObjectLocation());
+            }
         } catch (IOException | CsvException e) {
             this.logger.error(e.toString());
             e.printStackTrace();
