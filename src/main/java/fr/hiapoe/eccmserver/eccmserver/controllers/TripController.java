@@ -1,6 +1,7 @@
 package fr.hiapoe.eccmserver.eccmserver.controllers;
 
 import fr.hiapoe.eccmserver.eccmserver.dto.TripDTO;
+import fr.hiapoe.eccmserver.eccmserver.entities.CarLog;
 import fr.hiapoe.eccmserver.eccmserver.services.CarLogService;
 import fr.hiapoe.eccmserver.eccmserver.services.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,15 @@ public class TripController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(tripDTOList);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<TripDTO> getTripById(@PathVariable String id) {
+        List<CarLog> carLogs = this.carLogService.findAllByTripId(id);
+        TripDTO tripDTO = this.tripService.createTripFromCarLogs(carLogs);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(tripDTO);
     }
 
 }
