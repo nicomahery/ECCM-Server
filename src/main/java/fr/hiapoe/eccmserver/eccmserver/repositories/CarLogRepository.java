@@ -18,4 +18,8 @@ public interface CarLogRepository extends JpaRepository<CarLog, LocalDateTime> {
     @Query(nativeQuery = true,
             value = "SELECT * FROM car_log c WHERE c.trip_id = :tripId AND c.gps_latitude IS NOT NULL AND c.gps_longitude IS NOT NULL ORDER BY c.device_time LIMIT 1")
     Optional<CarLog> getFirstCarLogWithCoordinatesByTripId(String tripId);
+    @Query("SELECT MAX(c.deviceTime) FROM car_log c WHERE c.tripId = :tripId")
+    LocalDateTime getLastDeviceTimeForTripId(String tripId);
+    @Query("SELECT MIN(c.deviceTime) FROM car_log c WHERE c.tripId = :tripId")
+    LocalDateTime getFirstDeviceTimeForTripId(String tripId);
 }

@@ -38,7 +38,7 @@ public class TripController {
         List<String> ids = this.carLogService.findAllTripId();
         List<TripDTO> tripDTOList = new ArrayList<>();
         for (String id : ids) {
-            tripDTOList.add(this.tripService.createTripFromCarLogs(this.carLogService.findAllByTripId(id)));
+            tripDTOList.add(this.tripService.createTripFromCarLogs(id));
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -47,11 +47,9 @@ public class TripController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<TripDTO> getTripById(@PathVariable String id) {
-        List<CarLog> carLogs = this.carLogService.findAllByTripId(id);
-        TripDTO tripDTO = this.tripService.createTripFromCarLogs(carLogs);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(tripDTO);
+                .body(this.tripService.createTripFromCarLogs(id));
     }
 
 }

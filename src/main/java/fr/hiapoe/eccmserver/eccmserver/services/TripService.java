@@ -18,11 +18,11 @@ public class TripService {
         this.carLogService = carLogService;
     }
 
-    public TripDTO createTripFromCarLogs(List<CarLog> carLogs) {
+    public TripDTO createTripFromCarLogs(String tripId) {
         TripDTO tripDTO = new TripDTO();
-        tripDTO.setId(carLogs.get(0).getTripId());
-        tripDTO.setStartTime(carLogs.get(0).getDeviceTime());
-        tripDTO.setStartTime(carLogs.get(carLogs.size()-1).getDeviceTime());
+        tripDTO.setId(tripId);
+        tripDTO.setStartTime(this.carLogService.getFirstDeviceTimeForTripId(tripId));
+        tripDTO.setEndTime(this.carLogService.getLastDeviceTimeForTripId(tripId));
         tripDTO.setStartCoordinate(this.carLogService.findFirstCoordinateForTripId(tripDTO.getId()));
         tripDTO.setEndCoordinate(this.carLogService.findLastCoordinateForTripId(tripDTO.getId()));
         return tripDTO;

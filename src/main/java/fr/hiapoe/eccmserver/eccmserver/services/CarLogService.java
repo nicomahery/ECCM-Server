@@ -6,6 +6,7 @@ import fr.hiapoe.eccmserver.eccmserver.utils.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,5 +39,13 @@ public class CarLogService {
     public Coordinate findFirstCoordinateForTripId(String tripId) {
         return this.carlogRepository.getFirstCarLogWithCoordinatesByTripId(tripId)
                 .map(carLog -> new Coordinate(carLog.getGpsLatitude(), carLog.getGpsLongitude())).orElse(null);
+    }
+
+    public LocalDateTime getLastDeviceTimeForTripId(String tripId) {
+        return this.carlogRepository.getLastDeviceTimeForTripId(tripId);
+    }
+
+    public LocalDateTime getFirstDeviceTimeForTripId(String tripId) {
+        return this.carlogRepository.getFirstDeviceTimeForTripId(tripId);
     }
 }
