@@ -1,5 +1,6 @@
 package fr.hiapoe.eccmserver.eccmserver.services;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -171,11 +173,15 @@ public class TripUploadService {
                     this.logger.error(e.toString());
                     e.printStackTrace();
                 }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    this.logger.warn(String.format("On file %s : Import of line %d ignored (total lines %d), due to wrong tsv formatting", carLogUploadDTO.getObjectLocation(), i, totalCarLogCount));
+                    importedCarLogCount++;
+                }
             }
             if (importedCarLogCount >= totalCarLogCount) {
                 this.s3Service.deleteObject(carLogUploadDTO.getObjectLocation());
             }
-        } catch (IOException | CsvException e) {
+        } catch (IOException | CsvException | AmazonS3Exception e) {
             this.logger.error(e.toString());
             e.printStackTrace();
         }
@@ -308,13 +314,23 @@ public class TripUploadService {
         if (Objects.isNull(this.parseValueToString(value))) {
             return null;
         }
-        return Double.parseDouble(value.split(" ")[0]);
+        try {
+            return Double.parseDouble(value.split(" ")[0]);
+        }
+        catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private LocalDateTime parseValueToLocalDateTime(String value) {
         if (Objects.isNull(this.parseValueToString(value))) {
             return null;
         }
-        return LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS"));
+        try {
+            return LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS"));
+        }
+        catch (DateTimeParseException e) {
+            return null;
+        }
     }
 }
