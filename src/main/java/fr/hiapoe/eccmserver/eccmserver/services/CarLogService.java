@@ -31,14 +31,14 @@ public class CarLogService {
         return this.carlogRepository.getAllTripId();
     }
 
-    public Coordinate findLastCoordinateForTripId(String tripId) {
+    public Optional<Coordinate> findLastCoordinateForTripId(String tripId) {
         return this.carlogRepository.getLastCarLogWithCoordinatesByTripId(tripId)
-                .map(carLog -> new Coordinate(carLog.getGpsLatitude(), carLog.getGpsLongitude())).orElse(null);
+                .map(carLog -> new Coordinate(carLog.getGpsLatitude(), carLog.getGpsLongitude()));
     }
 
-    public Coordinate findFirstCoordinateForTripId(String tripId) {
+    public Optional<Coordinate> findFirstCoordinateForTripId(String tripId) {
         return this.carlogRepository.getFirstCarLogWithCoordinatesByTripId(tripId)
-                .map(carLog -> new Coordinate(carLog.getGpsLatitude(), carLog.getGpsLongitude())).orElse(null);
+                .map(carLog -> new Coordinate(carLog.getGpsLatitude(), carLog.getGpsLongitude()));
     }
 
     public LocalDateTime getLastDeviceTimeForTripId(String tripId) {

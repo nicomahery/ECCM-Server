@@ -1,10 +1,11 @@
 package fr.hiapoe.eccmserver.eccmserver.controllers;
 
 import fr.hiapoe.eccmserver.eccmserver.dto.TripDTO;
-import fr.hiapoe.eccmserver.eccmserver.entities.CarLog;
 import fr.hiapoe.eccmserver.eccmserver.services.CarLogService;
 import fr.hiapoe.eccmserver.eccmserver.services.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,18 +39,23 @@ public class TripController {
         List<String> ids = this.carLogService.findAllTripId();
         List<TripDTO> tripDTOList = new ArrayList<>();
         for (String id : ids) {
-            tripDTOList.add(this.tripService.createTripFromCarLogs(id));
+            tripDTOList.add(this.tripService.createTripDTOFromCarLogs(id));
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(tripDTOList);
     }
 
+    @GetMapping(value = "/pageable")
+    public Page<TripDTO> getTripsPageable(Pageable pageable) {
+        return this.tripService.findAllTrip(pageable);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<TripDTO> getTripById(@PathVariable String id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(this.tripService.createTripFromCarLogs(id));
+                .body(this.tripService.createTripDTOFromCarLogs(id));
     }
 
 }

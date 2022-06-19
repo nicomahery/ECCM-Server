@@ -100,3 +100,13 @@ CREATE TABLE IF NOT EXISTS car_log(
 
 SELECT create_hypertable('car_log','device_time')
 WHERE NOT EXISTS (SELECT * FROM timescaledb_information.hypertables WHERE hypertable_name = 'car_log');
+
+CREATE TABLE IF NOT EXISTS trip(
+    id TEXT NOT NULL,
+    start_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    end_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    start_latitude double PRECISION NULL,
+    start_longitude double PRECISION NULL,
+    end_latitude double PRECISION NULL,
+    end_longitude double PRECISION NULL
+);

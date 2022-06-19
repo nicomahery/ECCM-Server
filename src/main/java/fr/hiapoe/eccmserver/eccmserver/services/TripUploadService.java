@@ -18,6 +18,7 @@ import org.springframework.dao.TransientDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,6 +33,7 @@ public class TripUploadService {
     private final CarLogService carLogService;
     private final S3Service s3Service;
     private final CSVParser csvParser;
+    private final TripService tripService;
     private final Logger logger = LoggerFactory.getLogger(TripUploadService.class);
     public static final char SEPARATION_CHARACTER = '\t';
 
@@ -133,9 +135,10 @@ public class TripUploadService {
     };
 
     @Autowired
-    public TripUploadService(CarLogService carLogService, S3Service s3Service) {
+    public TripUploadService(CarLogService carLogService, S3Service s3Service, TripService tripService) {
         this.carLogService = carLogService;
         this.s3Service = s3Service;
+        this.tripService = tripService;
         this.csvParser = new CSVParserBuilder().withSeparator(SEPARATION_CHARACTER).build();
     }
 
@@ -180,6 +183,9 @@ public class TripUploadService {
             }
             if (importedCarLogCount >= totalCarLogCount) {
                 this.s3Service.deleteObject(carLogUploadDTO.getObjectLocation());
+            }
+            if (importedCarLogCount > 0) {
+                this.tripService.saveByTripId(tripId);
             }
         } catch (IOException | CsvException | AmazonS3Exception e) {
             this.logger.error(e.toString());
