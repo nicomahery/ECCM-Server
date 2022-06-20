@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 
 @Service
@@ -43,6 +45,8 @@ public class TripService {
     public List<String> findAllId() {
         return this.tripRepository.getAllId();
     }
+
+    public Optional<TripDTO> findById(String id) { return this.tripRepository.findById(id).flatMap(trip -> Optional.of(this.convertEntityToDTO(trip))); }
 
     public TripDTO createTripDTOFromCarLogs(String tripId) {
         TripDTO tripDTO = new TripDTO();

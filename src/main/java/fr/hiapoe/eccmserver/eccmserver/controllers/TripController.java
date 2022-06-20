@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping(value = "/api/trips", produces = {MediaType.APPLICATION_JSON_VALUE},
         consumes = {MediaType.APPLICATION_JSON_VALUE})
@@ -52,10 +53,16 @@ public class TripController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<TripDTO> getTripById(@PathVariable String id) {
+    public ResponseEntity<Object> getTripById(@PathVariable String id) {
+        Optional<TripDTO> optionalTripDTO = this.tripService.findById(id);
+        if (optionalTripDTO.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(String.format("no trip found for id: %s", id));
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(this.tripService.createTripDTOFromCarLogs(id));
+                .body(optionalTripDTO.get());
     }
 
 }
